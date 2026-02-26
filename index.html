@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Cheat Portal</title>
+<style>
+body {
+  margin: 0;
+  background: black;
+  color: #00ff00;
+  font-family: monospace;
+  overflow: hidden;
+}
+
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+button {
+  padding: 15px 30px;
+  font-size: 18px;
+  background: #00ff00;
+  border: none;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+#status {
+  margin-top: 15px;
+  color: yellow;
+}
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="container">
+  <h1>Secure Cheat Portal</h1>
+  <label>
+    <input type="checkbox" onclick="verifyUser()">
+    If you want to get the cheats, click verify
+  </label>
+  <div id="status"></div>
+  <button onclick="downloadFile()">Download</button>
+</div>
+
+<script>
+// MATRIX EFFECT
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
+
+const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const fontSize = 16;
+const columns = canvas.width / fontSize;
+const drops = [];
+
+for (let x = 0; x < columns; x++)
+  drops[x] = 1;
+
+function draw() {
+  ctx.fillStyle = "rgba(0,0,0,0.05)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "#0F0";
+  ctx.font = fontSize + "px monospace";
+
+  for (let i = 0; i < drops.length; i++) {
+    const text = letters.charAt(Math.floor(Math.random() * letters.length));
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+      drops[i] = 0;
+
+    drops[i]++;
+  }
+}
+
+setInterval(draw, 33);
+
+// VERIFY
+let verified = false;
+
+function verifyUser() {
+  document.getElementById("status").innerText = "Verifying...";
+  setTimeout(() => {
+    document.getElementById("status").innerText = "Access Verified ✔";
+    verified = true;
+  }, 2000);
+}
+
+// DOWNLOAD
+function downloadFile() {
+  if (!verified) {
+    alert("You must verify first!");
+    return;
+  }
+
+  const fileContent = `
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  margin:0;
+  background:black;
+  color:#00ff00;
+  font-family:monospace;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  text-align:center;
+}
+</style>
+</head>
+<body>
+
+<div id="text"></div>
+
+<script>
+const lines = [
+"Initializing Cheat Loader...",
+"Connecting...",
+"Decrypting files...",
+"Injecting assets...",
+"",
+"😄 Nice try!",
+"That was just a demo."
+];
+
+let i = 0;
+function showLine() {
+  if (i < lines.length) {
+    document.getElementById("text").innerHTML += lines[i] + "<br>";
+    i++;
+    setTimeout(showLine, 800);
+  }
+}
+
+showLine();
+<\/script>
+
+</body>
+</html>
+`;
+
+  const blob = new Blob([fileContent], { type: "text/html" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "CheatLoader.html";
+  link.click();
+}
+</script>
+
+</body>
+</html>
